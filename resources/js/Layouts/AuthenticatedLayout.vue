@@ -39,6 +39,12 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Dashboard
                                 </NavLink>
+                                   <NavLink
+                                       :href="route('bingo.create')"
+                                       :active="route().current('bingo.show')"
+                                   >
+                                       Bingo
+                                   </NavLink>
                             </div>
                         </div>
 
