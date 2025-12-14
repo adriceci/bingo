@@ -3,6 +3,7 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
+    base: '/vite/',
     plugins: [
         laravel({
             input: 'resources/js/app.js',
@@ -21,9 +22,9 @@ export default defineConfig({
         host: '0.0.0.0',
         port: 5173,
         hmr: {
-            host: 'localhost',
-            port: 5173,
-            protocol: 'http',
+            host: 'bingo.adriancecilia.com',
+            port: 443,
+            protocol: 'https',
         },
         cors: true,
     },
