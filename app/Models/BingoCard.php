@@ -19,6 +19,7 @@ class BingoCard extends Model
     protected $fillable = [
         'id',
         'game_id',
+        'user_id',
         'card_number',
         'numbers_grid',
         'grid_hash',
@@ -40,5 +41,10 @@ class BingoCard extends Model
     public function game()
     {
         return $this->belongsTo(Game::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

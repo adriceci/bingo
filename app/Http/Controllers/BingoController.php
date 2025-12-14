@@ -30,9 +30,11 @@ class BingoController extends Controller
 
     public function store(Request $request)
     {
+        $userId = $request->user()?->id ?: null;
+
         $game = Game::create([
             'id' => (string) Str::uuid(),
-            'user_id' => $request->user()?->id,
+            'user_id' => $userId,
             'status' => Game::STATUS_ACTIVE,
             'max_number' => 99,
             'drawn_numbers' => [],
@@ -43,9 +45,15 @@ class BingoController extends Controller
         return redirect()->route('bingo.show', $game);
     }
 
-    public function show(Game $game): Response
+    public function show(Request $request, Game $game): Response
     {
-        $game->load(['cards' => fn($query) => $query->where('archived', false)->orderBy('card_number')]);
+        $userId = $request->user()->id;
+        $game->load([
+            'cards' => fn($query) => $query
+                ->where('user_id', $userId)
+                ->where('archived', false)
+                ->orderBy('card_number')
+        ]);
 
         return Inertia::render('Bingo/Index', [
             'game' => [
@@ -60,7 +68,7 @@ class BingoController extends Controller
                     'cardNumber' => $card->card_number,
                     'numbersGrid' => $card->numbers_grid,
                 ]),
-            'archivedCount' => $game->cards()->where('archived', true)->count(),
+            'archivedCount' => $game->cards()->where('user_id', $userId)->where('archived', true)->count(),
             'maxActiveCards' => self::MAX_ACTIVE_CARDS,
         ]);
     }
@@ -120,9 +128,11 @@ class BingoController extends Controller
         ]);
 
         $requested = (int) $data['count'];
-        $activeCount = $game->cards()->where('archived', false)->count();
-        if ($activeCount + $requested > self::MAX_ACTIVE_CARDS) {
-            return $this->error('Supera el límite de 50 tableros activos por partida.');
+        $userId = $request->user()->id;
+        $activeCount = $game->cards()->where('user_id', $userId)->where('archived', false)->count();
+        $maxCardsPerUser = 5;
+        if ($activeCount + $requested > $maxCardsPerUser) {
+            return $this->error('Supera el límite de ' . $maxCardsPerUser . ' tableros activos por usuario.');
         }
 
         $newCards = collect();
@@ -130,13 +140,14 @@ class BingoController extends Controller
         $nextCardNumber = (int) $game->cards()->max('card_number') + 1;
 
         try {
-            DB::transaction(function () use ($game, $requested, &$newCards, &$nextCardNumber, &$hashes) {
+            DB::transaction(function () use ($game, $requested, $userId, &$newCards, &$nextCardNumber, &$hashes) {
                 for ($i = 0; $i < $requested; $i++) {
                     [$grid, $hash] = $this->uniqueGridForGame($game, $hashes);
                     $hashes[] = $hash;
 
                     $card = new BingoCard([
                         'id' => (string) Str::uuid(),
+                        'user_id' => $userId,
                         'card_number' => $nextCardNumber + $i,
                         'numbers_grid' => $grid,
                         'grid_hash' => $hash,

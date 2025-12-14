@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('bingo_cards', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('game_id');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->unsignedSmallInteger('card_number');
             $table->json('numbers_grid');
             $table->string('grid_hash', 64);
@@ -24,6 +25,7 @@ return new class extends Migration
             $table->unique(['game_id', 'grid_hash']);
             $table->unique(['game_id', 'card_number']);
             $table->index(['game_id', 'archived']);
+            $table->index(['user_id', 'game_id']);
         });
     }
 

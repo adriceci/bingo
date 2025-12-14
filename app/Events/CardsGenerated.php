@@ -36,6 +36,7 @@ class CardsGenerated implements ShouldBroadcast
             'cards' => collect($this->cards)->map(function (BingoCard $card) {
                 return [
                     'id' => $card->id,
+                    'userId' => $card->user_id,
                     'cardNumber' => $card->card_number,
                     'numbersGrid' => $card->numbers_grid,
                 ];

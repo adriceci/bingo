@@ -1,13 +1,16 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import NumberGrid from '@/Components/Bingo/NumberGrid.vue';
 import BingoCardDisplay from '@/Components/Bingo/BingoCardDisplay.vue';
 import PlayersList from '@/Components/Bingo/PlayersList.vue';
 import NotificationCenter from '@/Components/NotificationCenter.vue';
-import FormModal from '@/Components/FormModal.vue';
+import CreateCardsModal from '@/Components/Modal/CreateCardsModal.vue';
 import { notify, notifyError } from '@/Composables/useNotifications';
+
+const page = usePage();
+const currentUserId = computed(() => page.props.auth.user.id);
 
 const props = defineProps({
     game: {
@@ -43,7 +46,6 @@ const state = reactive({
     },
 });
 
-const countToGenerate = ref(1);
 const showGenerateModal = ref(false);
 const maxCardsPerUser = 5;
 const channel = ref(null);
@@ -58,7 +60,7 @@ const canDraw = computed(
 );
 
 const canGenerateCards = computed(
-    () => state.status === 'active' && state.cards.length < props.maxActiveCards,
+    () => state.status === 'active' && state.cards.length < maxCardsPerUser,
 );
 
 const shareUrl = computed(() => `${window.location.origin}/bingo/${props.game.id}`);
@@ -90,7 +92,12 @@ const listenEvents = () => {
             state.drawnNumbers = payload.drawnNumbers ?? state.drawnNumbers;
         })
         .listen('CardsGenerated', (payload) => {
-            state.cards = [...state.cards, ...(payload.cards ?? [])];
+            const myCards = (payload.cards ?? []).filter(
+                card => card.userId === currentUserId.value
+            );
+            if (myCards.length > 0) {
+                state.cards = [...state.cards, ...myCards];
+            }
         })
         .listen('GameReset', (payload) => {
             state.status = payload.status ?? 'active';
@@ -149,13 +156,13 @@ const drawNumber = async () => {
     }
 };
 
-const generateCards = async () => {
+const generateCards = async (count) => {
     if (!canGenerateCards.value) {
         notify('No puedes generar más tableros en esta partida.', 'error');
         return;
     }
 
-    const amount = Math.min(countToGenerate.value || 1, maxCardsPerUser);
+    const amount = Math.min(count || 1, maxCardsPerUser);
 
     const data = await postAction(
         'bingo.cards',
@@ -166,7 +173,6 @@ const generateCards = async () => {
     if (data?.cards) {
         state.cards = [...state.cards, ...data.cards];
         showGenerateModal.value = false;
-        countToGenerate.value = 1;
     }
 };
 
@@ -331,47 +337,15 @@ const activateGame = async () => {
         </div>
     </AuthenticatedLayout>
 
-    <FormModal 
-        :show="showGenerateModal" 
-        title="Generar tableros"
+    <CreateCardsModal
+        :show="showGenerateModal"
+        :loading="state.loading.generate"
+        :can-generate="canGenerateCards"
+        :max-cards-per-user="maxCardsPerUser"
+        :current-cards-count="state.cards.length"
         @close="showGenerateModal = false"
-    >
-        <template #content>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Cantidad de tableros
-                </label>
-                <input
-                    v-model.number="countToGenerate"
-                    class="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
-                    min="1"
-                    :max="maxCardsPerUser"
-                    type="number"
-                />
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    Máximo de {{ maxCardsPerUser }} tableros por persona
-                </p>
-            </div>
-        </template>
-
-        <template #actions>
-            <button
-                class="rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                type="button"
-                @click="showGenerateModal = false"
-            >
-                Cancelar
-            </button>
-            <button
-                class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                :disabled="state.loading.generate"
-                type="button"
-                @click="generateCards"
-            >
-                {{ state.loading.generate ? 'Generando...' : 'Generar' }}
-            </button>
-        </template>
-    </FormModal>
+        @generate="generateCards"
+    />
 
     <NotificationCenter />
 </template>
