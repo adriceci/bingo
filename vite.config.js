@@ -20,8 +20,16 @@ export default defineConfig({
     server: {
         host: '0.0.0.0',
         port: 5173,
+        middlewareMode: false,
+        cors: {
+            origin: '*',
+            credentials: true,
+            methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+        },
         hmr: {
-            host: 'localhost',
+            host: process.env.VITE_HMR_HOST || 'localhost',
+            port: process.env.VITE_HMR_PORT || 5173,
+            protocol: process.env.VITE_HMR_PROTOCOL || 'ws',
         },
     },
 });

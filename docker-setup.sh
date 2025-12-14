@@ -29,6 +29,11 @@ if [ ! -f .env ]; then
         sed -i.bak 's/MAIL_HOST=127.0.0.1/MAIL_HOST=mailpit/' .env
         sed -i.bak 's/MAIL_PORT=2525/MAIL_PORT=1025/' .env
         
+        # Update Vite HMR configuration for Docker
+        sed -i.bak 's/VITE_HMR_HOST=localhost/VITE_HMR_HOST=localhost/' .env
+        sed -i.bak 's/VITE_HMR_PORT=5173/VITE_HMR_PORT=5173/' .env
+        sed -i.bak 's/VITE_HMR_PROTOCOL=ws/VITE_HMR_PROTOCOL=ws/' .env
+        
         # Clean up backup files
         rm -f .env.bak
     else
@@ -83,7 +88,7 @@ fi
 
 # Install Node dependencies
 echo -e "${GREEN}📦 Installing Node dependencies...${NC}"
-docker compose exec -T vite npm install
+docker compose exec -T app npm install
 
 # Run migrations
 echo -e "${GREEN}🗄️  Running database migrations...${NC}"
@@ -99,6 +104,7 @@ echo -e "${GREEN}✅ Setup complete!${NC}"
 echo -e "${GREEN}🌐 Application is available at: http://localhost:8020${NC}"
 echo -e "${GREEN}📊 Database is available at: localhost:3326${NC}"
 echo -e "${GREEN}📧 Mailpit is available at: http://localhost:8045${NC}"
-echo -e "${GREEN}⚡ Vite dev server is available at: http://localhost:5193${NC}"
+echo -e "${GREEN}⚡ Vite dev server is available at: http://localhost:5173${NC}"
 echo -e "${YELLOW}💡 To view logs: docker compose logs -f${NC}"
+echo -e "${YELLOW}💡 To start Vite dev server: docker compose exec app npm run dev${NC}"
 echo -e "${YELLOW}💡 To stop containers: docker compose down${NC}"

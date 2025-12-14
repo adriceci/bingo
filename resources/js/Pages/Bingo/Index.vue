@@ -111,6 +111,7 @@ const listenEvents = () => {
             notify('La partida fue cerrada', 'info');
         })
         .listen('LineCompleted', (payload) => {
+            console.log('LineCompleted payload:', payload);
             state.status = 'active';
             if (payload.userId === currentUserId.value) {
                 notify(`¡LÍNEA! Tablero ${payload.cardNumber}`, 'success');
@@ -119,6 +120,7 @@ const listenEvents = () => {
             }
         })
         .listen('BingoWon', (payload) => {
+            console.log('BingoWon payload:', payload);
             state.status = 'closed';
             if (payload.userId === currentUserId.value) {
                 notify(`¡¡BINGO!! ¡¡Ganaste con el tablero ${payload.cardNumber}!!`, 'success');
