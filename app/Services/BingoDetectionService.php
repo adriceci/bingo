@@ -17,20 +17,20 @@ class BingoDetectionService
     public static function hasCompletedLine(BingoCard $card, array $drawnNumbers): bool
     {
         $grid = $card->numbers_grid;
-        
+
         foreach ($grid as $row) {
             $rowNumbers = array_filter($row, fn($num) => $num !== null);
-            
+
             if (empty($rowNumbers)) {
                 continue;
             }
-            
+
             // Verificar si todos los números de la fila están en los números sacados
             if (static::allNumbersDrawn($rowNumbers, $drawnNumbers)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -45,7 +45,7 @@ class BingoDetectionService
     {
         $grid = $card->numbers_grid;
         $allNumbers = [];
-        
+
         foreach ($grid as $row) {
             foreach ($row as $number) {
                 if ($number !== null) {
@@ -53,11 +53,11 @@ class BingoDetectionService
                 }
             }
         }
-        
+
         if (empty($allNumbers)) {
             return false;
         }
-        
+
         return static::allNumbersDrawn($allNumbers, $drawnNumbers);
     }
 
@@ -71,13 +71,13 @@ class BingoDetectionService
     private static function allNumbersDrawn(array $numbers, array $drawnNumbers): bool
     {
         $drawnSet = array_flip($drawnNumbers);
-        
+
         foreach ($numbers as $number) {
             if (!isset($drawnSet[$number])) {
                 return false;
             }
         }
-        
+
         return true;
     }
 }
