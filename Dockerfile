@@ -33,8 +33,8 @@ COPY docker/php/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Set proper permissions (will be overridden by volumes, but good to have as fallback)
 RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage \
-    && chmod -R 755 /var/www/bootstrap/cache
+    && chmod -R 775 /var/www/storage \
+    && chmod -R 775 /var/www/bootstrap/cache
 
 # Copy and set permissions for entrypoint script
 COPY docker-entrypoint.sh /usr/local/bin/

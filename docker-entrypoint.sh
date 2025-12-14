@@ -25,20 +25,20 @@ fi
 echo "Setting permissions for storage and cache directories..."
 
 # Create directories if they don't exist
-mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
-mkdir -p /var/www/html/storage/framework/cache/data
-mkdir -p /var/www/html/storage/logs
-mkdir -p /var/www/html/bootstrap/cache
+mkdir -p /var/www/storage/framework/{sessions,views,cache}
+mkdir -p /var/www/storage/framework/cache/data
+mkdir -p /var/www/storage/logs
+mkdir -p /var/www/bootstrap/cache
 
 # Set ownership to www-data
-chown -R www-data:www-data /var/www/html/storage
-chown -R www-data:www-data /var/www/html/bootstrap/cache
+chown -R www-data:www-data /var/www/storage
+chown -R www-data:www-data /var/www/bootstrap/cache
 
 # Set directory permissions (775 allows owner and group to write)
-find /var/www/html/storage -type d -exec chmod 775 {} \;
-find /var/www/html/storage -type f -exec chmod 664 {} \;
-find /var/www/html/bootstrap/cache -type d -exec chmod 775 {} \;
-find /var/www/html/bootstrap/cache -type f -exec chmod 664 {} \;
+find /var/www/storage -type d -exec chmod 775 {} \;
+find /var/www/storage -type f -exec chmod 664 {} \;
+find /var/www/bootstrap/cache -type d -exec chmod 775 {} \;
+find /var/www/bootstrap/cache -type f -exec chmod 664 {} \;
 
 echo "Permissions set successfully!"
 
