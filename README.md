@@ -33,6 +33,20 @@ Este script se encargará de:
 -   Generar la clave de aplicación
 -   Ejecutar migraciones
 -   Ejecutar seeders (si existen)
+-   Mostrar URLs y puertos de servicios
+-   Instrucciones para iniciar el servidor Vite
+
+3. Iniciar el servidor de desarrollo de Vite (si no quedó corriendo automáticamente):
+
+```bash
+docker compose exec app npm run dev
+```
+
+4. Abre la aplicación en el navegador:
+
+```bash
+open http://localhost:8020
+```
 
 ### Método 2: Instalación manual
 
@@ -70,13 +84,19 @@ docker compose exec app php artisan key:generate
 6. Instalar dependencias de Node:
 
 ```bash
-docker compose exec vite npm install
+docker compose exec app npm install
 ```
 
 7. Ejecutar las migraciones:
 
 ```bash
 docker compose exec app php artisan migrate
+```
+
+8. Iniciar el servidor de desarrollo de Vite:
+
+```bash
+docker compose exec app npm run dev
 ```
 
 ## Servicios
@@ -86,7 +106,25 @@ docker compose exec app php artisan migrate
 -   **Redis**: localhost:6399
 -   **Mailpit Web UI**: http://localhost:8045
 -   **Mailpit SMTP**: localhost:1045
--   **Vite (HMR)**: http://localhost:5193
+-   **Vite (HMR)**: http://localhost:5173
+
+### Variables de entorno relevantes (HMR)
+
+Para desarrollo con Docker, estas variables en `.env` controlan el HMR de Vite:
+
+```env
+VITE_HMR_HOST=localhost
+VITE_HMR_PORT=5173
+VITE_HMR_PROTOCOL=ws
+```
+
+Si trabajas con HTTPS o un servidor remoto, ajusta:
+
+```env
+VITE_HMR_HOST=tu-dominio.com
+VITE_HMR_PORT=443
+VITE_HMR_PROTOCOL=wss
+```
 
 ## Comandos útiles
 
@@ -120,13 +158,14 @@ docker compose exec app php artisan migrate:fresh --seed
 
 ```bash
 # Los assets de Vite se compilan automáticamente con HMR
-# El servidor de desarrollo está corriendo en el contenedor vite
+# Inicia el servidor de desarrollo dentro del servicio app
+docker compose exec app npm run dev
 
 # Para instalar paquetes npm
-docker compose exec vite npm install <package>
+docker compose exec app npm install <package>
 
 # Para construir para producción:
-docker compose exec vite npm run build
+docker compose exec app npm run build
 ```
 
 ### Docker
