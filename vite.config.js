@@ -23,7 +23,6 @@ export default defineConfig({
         port: 5173,
         hmr: {
             host: 'bingo.adriancecilia.com',
-            port: 443,
             protocol: 'https',
         },
         cors: true,

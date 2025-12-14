@@ -18,10 +18,7 @@ const drawnSet = computed(() => new Set(props.drawnNumbers ?? []));
 
 <template>
     <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        <div class="mb-3 flex items-center justify-between">
-            <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                Números (1-{{ maxNumber }})
-            </p>
+        <div class="mb-3 flex justify-end">
             <p class="text-xs text-gray-500 dark:text-gray-400">
                 {{ drawnSet.size }} / {{ maxNumber }}
             </p>

@@ -54,8 +54,10 @@ const remainingNumbers = computed(
     () => props.game.maxNumber - state.drawnNumbers.length,
 );
 
+const isGameCreator = computed(() => props.game.user_id === currentUserId.value);
+
 const canDraw = computed(
-    () => state.status === 'active' && remainingNumbers.value > 0,
+    () => state.status === 'active' && remainingNumbers.value > 0 && state.cards.length > 0 && isGameCreator.value,
 );
 
 const canGenerateCards = computed(
@@ -280,10 +282,12 @@ const closeGame = async () => {
             <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     <div class="space-y-4 lg:col-span-2">
+                        <NumberGrid :drawn-numbers="state.drawnNumbers" :max-number="props.game.maxNumber" />
+
                         <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                             <div class="flex flex-wrap items-center gap-3">
                                 <button
-                                    class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                                    class="rounded-lg bg-emerald-600 mx-auto px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                                     :disabled="state.loading.draw || !canDraw"
                                     type="button"
                                     @click="drawNumber"
@@ -292,8 +296,6 @@ const closeGame = async () => {
                                 </button>
                             </div>
                         </div>
-
-                        <NumberGrid :drawn-numbers="state.drawnNumbers" :max-number="props.game.maxNumber" />
 
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <BingoCardDisplay
@@ -318,14 +320,6 @@ const closeGame = async () => {
                                 @click="openGenerateModal"
                             >
                                 Generar tableros
-                            </button>
-                            <button
-                                class="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                                :disabled="state.loading.reset"
-                                type="button"
-                                @click="resetGame"
-                            >
-                                {{ state.loading.reset ? 'Reiniciando...' : 'Reset' }}
                             </button>
                         </div>
                         <PlayersList :players="state.players" />
