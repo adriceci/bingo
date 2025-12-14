@@ -18,12 +18,12 @@ export default defineConfig({
         }),
     ],
     server: {
-        https: true,
         host: '0.0.0.0',
         port: 5173,
         hmr: {
-            host: 'localhost',
-            port: 5193,
+            host: 'vite.bingo.adriancecilia.com',
+            port: 443,
+            protocol: 'wss',
         },
         cors: true,
     },
