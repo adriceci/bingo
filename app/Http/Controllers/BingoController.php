@@ -61,6 +61,7 @@ class BingoController extends Controller
         return Inertia::render('Bingo/Index', [
             'game' => [
                 'id' => $game->id,
+                'user_id' => $game->user_id,
                 'status' => $game->status,
                 'drawnNumbers' => $game->drawn_numbers ?? [],
                 'maxNumber' => $game->max_number,
@@ -135,14 +136,14 @@ class BingoController extends Controller
                 $card->update(['winner' => true]);
                 $game->update(['winner_user_id' => $card->user_id, 'status' => Game::STATUS_CLOSED]);
 
-                broadcast(new BingoWon($game, $card->user_id, $card->id, $card->card_number))->toOthers();
+                broadcast(new BingoWon($game, $card->user_id, $card->id, $card->card_number));
                 return; // El juego termina con el primer bingo
             }
 
             // Verificar si hay línea (solo si no tiene línea registrada aún)
             if (!$card->has_line && BingoDetectionService::hasCompletedLine($card, $drawnNumbers)) {
                 $card->update(['has_line' => true]);
-                broadcast(new LineCompleted($game, $card, $card->user_id))->toOthers();
+                broadcast(new LineCompleted($game, $card, $card->user_id));
             }
         }
     }
