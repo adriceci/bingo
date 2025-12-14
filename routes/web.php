@@ -18,6 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/bingo', [BingoController::class, 'create'])->name('bingo.home');
+    Route::get('/bingo/history', [BingoController::class, 'history'])->name('bingo.history');
     Route::post('/bingo/create', [BingoController::class, 'store'])->name('bingo.create');
     Route::get('/bingo/{game}', [BingoController::class, 'show'])->name('bingo.show');
     Route::post('/bingo/{game}/activate', [BingoController::class, 'activate'])->name('bingo.activate');

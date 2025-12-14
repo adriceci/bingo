@@ -289,6 +289,18 @@ class BingoController extends Controller
         throw new \RuntimeException('No se pudo generar un tablero único tras varios intentos.');
     }
 
+    public function history(Request $request): Response
+    {
+        $games = Game::where('user_id', $request->user()->id)
+            ->orderBy('created_at', 'desc')
+            ->with(['cards' => fn($query) => $query->selectRaw('game_id, count(*) as total_cards')->groupBy('game_id')])
+            ->paginate(15);
+
+        return Inertia::render('Bingo/History', [
+            'games' => $games,
+        ]);
+    }
+
     private function gamePayload(Game $game): array
     {
         return [

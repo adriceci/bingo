@@ -39,6 +39,12 @@ const showingNavigationDropdown = ref(false);
                                    >
                                        Bingo
                                    </NavLink>
+                                   <NavLink
+                                       :href="route('bingo.history')"
+                                       :active="route().current('bingo.history')"
+                                   >
+                                       Historial
+                                   </NavLink>
                             </div>
                         </div>
 
@@ -145,6 +151,12 @@ const showingNavigationDropdown = ref(false);
                             :active="route().current('bingo.show') || route().current('bingo.home')"
                         >
                             Bingo
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('bingo.history')"
+                            :active="route().current('bingo.history')"
+                        >
+                            Historial
                         </ResponsiveNavLink>
                     </div>
 

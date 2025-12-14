@@ -6,6 +6,7 @@ import NumberGrid from '@/Components/Bingo/NumberGrid.vue';
 import BingoCardDisplay from '@/Components/Bingo/BingoCardDisplay.vue';
 import PlayersList from '@/Components/Bingo/PlayersList.vue';
 import NotificationCenter from '@/Components/NotificationCenter.vue';
+import FormModal from '@/Components/FormModal.vue';
 import { notify, notifyError } from '@/Composables/useNotifications';
 
 const props = defineProps({
@@ -43,6 +44,8 @@ const state = reactive({
 });
 
 const countToGenerate = ref(1);
+const showGenerateModal = ref(false);
+const maxCardsPerUser = 5;
 const channel = ref(null);
 const channelName = `bingo-game.${props.game.id}`;
 
@@ -152,7 +155,7 @@ const generateCards = async () => {
         return;
     }
 
-    const amount = Math.min(countToGenerate.value || 1, props.maxActiveCards);
+    const amount = Math.min(countToGenerate.value || 1, maxCardsPerUser);
 
     const data = await postAction(
         'bingo.cards',
@@ -162,7 +165,17 @@ const generateCards = async () => {
 
     if (data?.cards) {
         state.cards = [...state.cards, ...data.cards];
+        showGenerateModal.value = false;
+        countToGenerate.value = 1;
     }
+};
+
+const openGenerateModal = () => {
+    if (!canGenerateCards.value) {
+        notify('No puedes generar más tableros en esta partida.', 'error');
+        return;
+    }
+    showGenerateModal.value = true;
 };
 
 const resetGame = async () => {
@@ -267,32 +280,6 @@ const activateGame = async () => {
                                     {{ state.loading.draw ? 'Sacando...' : 'Sacar número' }}
                                 </button>
                                 <button
-                                    class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                                    :disabled="state.loading.generate || !canGenerateCards"
-                                    type="button"
-                                    @click="generateCards"
-                                >
-                                    {{ state.loading.generate ? 'Generando...' : 'Generar tableros' }}
-                                </button>
-                                <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
-                                    Cantidad
-                                    <input
-                                        v-model.number="countToGenerate"
-                                        class="w-20 rounded border border-gray-300 px-2 py-1 text-sm text-gray-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
-                                        min="1"
-                                        :max="maxActiveCards"
-                                        type="number"
-                                    />
-                                </label>
-                                <button
-                                    class="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                                    :disabled="state.loading.reset"
-                                    type="button"
-                                    @click="resetGame"
-                                >
-                                    {{ state.loading.reset ? 'Reiniciando...' : 'Reset' }}
-                                </button>
-                                <button
                                     class="rounded-lg bg-slate-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                                     :disabled="state.loading.activate || state.status === 'closed'"
                                     type="button"
@@ -320,11 +307,71 @@ const activateGame = async () => {
 
                     <div class="space-y-4">
                         <PlayersList :players="state.players" />
+                        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                            <button
+                                class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                                :disabled="!canGenerateCards"
+                                type="button"
+                                @click="openGenerateModal"
+                            >
+                                Generar tableros
+                            </button>
+                            <button
+                                class="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                                :disabled="state.loading.reset"
+                                type="button"
+                                @click="resetGame"
+                            >
+                                {{ state.loading.reset ? 'Reiniciando...' : 'Reset' }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </AuthenticatedLayout>
+
+    <FormModal 
+        :show="showGenerateModal" 
+        title="Generar tableros"
+        @close="showGenerateModal = false"
+    >
+        <template #content>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Cantidad de tableros
+                </label>
+                <input
+                    v-model.number="countToGenerate"
+                    class="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
+                    min="1"
+                    :max="maxCardsPerUser"
+                    type="number"
+                />
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Máximo de {{ maxCardsPerUser }} tableros por persona
+                </p>
+            </div>
+        </template>
+
+        <template #actions>
+            <button
+                class="rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                type="button"
+                @click="showGenerateModal = false"
+            >
+                Cancelar
+            </button>
+            <button
+                class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                :disabled="state.loading.generate"
+                type="button"
+                @click="generateCards"
+            >
+                {{ state.loading.generate ? 'Generando...' : 'Generar' }}
+            </button>
+        </template>
+    </FormModal>
 
     <NotificationCenter />
 </template>
