@@ -1,59 +1,158 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Bingo - Laravel + Vue + Vite
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Proyecto Laravel con Vue 3, Vite y Docker.
 
-## About Laravel
+## Requisitos
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Docker
+- Docker Compose
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Instalación
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Método 1: Instalación automática (Recomendado)
 
-## Learning Laravel
+1. Clonar el repositorio:
+```bash
+git clone <repository-url>
+cd bingo
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+2. Ejecutar el script de setup:
+```bash
+./docker-setup.sh
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Este script se encargará de:
+- Crear y configurar el archivo .env
+- Construir las imágenes de Docker
+- Levantar los contenedores
+- Instalar dependencias de PHP y Node
+- Generar la clave de aplicación
+- Ejecutar migraciones
+- Ejecutar seeders (si existen)
 
-## Laravel Sponsors
+### Método 2: Instalación manual
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. Clonar el repositorio:
+```bash
+git clone <repository-url>
+cd bingo
+```
 
-### Premium Partners
+2. Copiar el archivo de entorno:
+```bash
+cp .env.example .env
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+3. Construir y levantar los contenedores:
+```bash
+docker compose up -d --build
+```
 
-## Contributing
+4. Instalar dependencias de PHP:
+```bash
+docker compose exec app composer install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+5. Generar la clave de aplicación:
+```bash
+docker compose exec app php artisan key:generate
+```
 
-## Code of Conduct
+6. Instalar dependencias de Node:
+```bash
+docker compose exec vite npm install
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+7. Ejecutar las migraciones:
+```bash
+docker compose exec app php artisan migrate
+```
 
-## Security Vulnerabilities
+## Servicios
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **App (Laravel)**: http://localhost:8020
+- **MySQL**: localhost:3326
+- **Redis**: localhost:6399
+- **Mailpit Web UI**: http://localhost:8045
+- **Mailpit SMTP**: localhost:1045
+- **Vite (HMR)**: http://localhost:5193
 
-## License
+## Comandos útiles
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Laravel/PHP
+```bash
+# Ejecutar comandos artisan
+docker compose exec app php artisan <command>
+
+# Ejecutar composer
+docker compose exec app composer <command>
+
+# Acceder al contenedor
+docker compose exec app bash
+```
+
+### Base de datos
+```bash
+# Ejecutar migraciones
+docker compose exec app php artisan migrate
+
+# Rollback
+docker compose exec app php artisan migrate:rollback
+
+# Fresh migration con seeders
+docker compose exec app php artisan migrate:fresh --seed
+```
+
+### Frontend
+```bash
+# Los assets de Vite se compilan automáticamente con HMR
+# El servidor de desarrollo está corriendo en el contenedor vite
+
+# Para instalar paquetes npm
+docker compose exec vite npm install <package>
+
+# Para construir para producción:
+docker compose exec vite npm run build
+```
+
+### Docker
+```bash
+# Levantar servicios
+docker compose up -d
+
+# Detener servicios
+docker compose down
+
+# Ver logs
+docker compose logs -f
+
+# Ver logs de un servicio específico
+docker compose logs -f app
+
+# Reconstruir contenedores
+docker compose up -d --build
+```
+
+## Estructura
+
+- `app/` - Código de la aplicación Laravel
+- `resources/js/` - Componentes Vue
+- `resources/views/` - Vistas Blade
+- `docker/` - Configuración de Docker
+- `Dockerfile` - Imagen PHP/Laravel
+- `Dockerfile.node` - Imagen Node/Vite
+
+## Tecnologías
+
+- Laravel 12
+- Vue 3
+- Vite
+- Inertia.js
+- Tailwind CSS
+- MySQL 8.0
+- Redis
+- Mailpit (Email testing)
+- Nginx
+- PHP 8.2-FPM
+- Docker & Docker Compose
