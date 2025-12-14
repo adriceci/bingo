@@ -42,7 +42,6 @@ const state = reactive({
         generate: false,
         reset: false,
         close: false,
-        activate: false,
     },
 });
 
@@ -220,18 +219,6 @@ const closeGame = async () => {
     }
 };
 
-const activateGame = async () => {
-    if (state.status === 'closed') {
-        notify('La partida está cerrada.', 'error');
-        return;
-    }
-
-    const data = await postAction('bingo.activate', {}, 'activate');
-    if (data) {
-        state.status = data.status ?? 'active';
-        state.drawnNumbers = data.drawnNumbers ?? state.drawnNumbers;
-    }
-};
 </script>
 
 <template>
@@ -285,14 +272,6 @@ const activateGame = async () => {
                                 >
                                     {{ state.loading.draw ? 'Sacando...' : 'Sacar número' }}
                                 </button>
-                                <button
-                                    class="rounded-lg bg-slate-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                                    :disabled="state.loading.activate || state.status === 'closed'"
-                                    type="button"
-                                    @click="activateGame"
-                                >
-                                    {{ state.loading.activate ? 'Activando...' : 'Activar' }}
-                                </button>
                             </div>
                         </div>
 
@@ -304,6 +283,7 @@ const activateGame = async () => {
                                 :key="card.id"
                                 :card-number="card.cardNumber"
                                 :numbers-grid="card.numbersGrid"
+                                :drawn-numbers="state.drawnNumbers"
                             />
                             <div v-if="state.cards.length === 0" class="rounded-xl border border-dashed border-gray-300 bg-white p-6 text-center text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400">
                                 No hay tableros activos. Genera algunos para comenzar.
@@ -312,7 +292,6 @@ const activateGame = async () => {
                     </div>
 
                     <div class="space-y-4">
-                        <PlayersList :players="state.players" />
                         <div class="space-x-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                             <button
                                 class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
@@ -331,6 +310,7 @@ const activateGame = async () => {
                                 {{ state.loading.reset ? 'Reiniciando...' : 'Reset' }}
                             </button>
                         </div>
+                        <PlayersList :players="state.players" />
                     </div>
                 </div>
             </div>

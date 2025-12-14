@@ -1,4 +1,6 @@
 <script setup>
+import { computed } from 'vue';
+
 const props = defineProps({
     cardNumber: {
         type: Number,
@@ -8,7 +10,13 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    drawnNumbers: {
+        type: Array,
+        default: () => [],
+    },
 });
+
+const drawnSet = computed(() => new Set(props.drawnNumbers ?? []));
 </script>
 
 <template>
@@ -24,9 +32,11 @@ const props = defineProps({
                         :key="colIndex"
                         :class="[
                             'h-10 rounded border text-sm font-semibold flex items-center justify-center',
-                            cell
-                                ? 'border-indigo-300 bg-indigo-50 text-indigo-900 dark:border-indigo-500/60 dark:bg-indigo-900/40 dark:text-indigo-50'
-                                : 'border-dashed border-gray-300 bg-white text-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-600',
+                            cell === null
+                                ? 'border-dashed border-gray-300 bg-white text-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-600'
+                                : drawnSet.has(cell)
+                                    ? 'border-emerald-500 bg-emerald-50 text-emerald-900 dark:border-emerald-500/70 dark:bg-emerald-900/40 dark:text-emerald-50'
+                                    : 'border-indigo-300 bg-indigo-50 text-indigo-900 dark:border-indigo-500/60 dark:bg-indigo-900/40 dark:text-indigo-50',
                         ]"
                     >
                         {{ cell ?? '—' }}

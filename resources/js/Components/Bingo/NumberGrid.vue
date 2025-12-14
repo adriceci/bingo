@@ -8,7 +8,7 @@ const props = defineProps({
     },
     maxNumber: {
         type: Number,
-        default: 99,
+        default: 90,
     },
 });
 
@@ -26,7 +26,7 @@ const drawnSet = computed(() => new Set(props.drawnNumbers ?? []));
                 {{ drawnSet.size }} / {{ maxNumber }}
             </p>
         </div>
-        <div class="grid grid-cols-10 gap-1 text-xs sm:text-sm">
+        <div class="grid grid-cols-9 gap-1 text-xs sm:text-sm">
             <div
                 v-for="value in numbers"
                 :key="value"
