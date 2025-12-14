@@ -27,7 +27,7 @@ const props = defineProps({
     },
     maxActiveCards: {
         type: Number,
-        default: 50,
+        default: 100,
     },
 });
 
@@ -313,7 +313,7 @@ const activateGame = async () => {
 
                     <div class="space-y-4">
                         <PlayersList :players="state.players" />
-                        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                        <div class="space-x-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                             <button
                                 class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                                 :disabled="!canGenerateCards"

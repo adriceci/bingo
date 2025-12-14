@@ -18,9 +18,9 @@ use Inertia\Response;
 
 class BingoController extends Controller
 {
-    private const MAX_ACTIVE_CARDS = 50;
+    private const MAX_ACTIVE_CARDS = 100;
     private const GRID_ROWS = 3;
-    private const GRID_COLUMNS = 10;
+    private const GRID_COLUMNS = 9;
     private const MAX_ATTEMPTS_PER_CARD = 25;
 
     public function create(Request $request)
@@ -36,7 +36,7 @@ class BingoController extends Controller
             'id' => (string) Str::uuid(),
             'user_id' => $userId,
             'status' => Game::STATUS_ACTIVE,
-            'max_number' => 99,
+            'max_number' => 90,
             'drawn_numbers' => [],
         ]);
 
@@ -221,32 +221,60 @@ class BingoController extends Controller
     }
 
     /**
+     * Generate a bingo card with 3 rows, 9 columns, and exactly 5 numbers per row (15 total).
+     * Each column corresponds to a range: 1-9, 10-19, ..., 80-90.
+     * Each row has exactly 5 numbers in random columns, with 4 blanks.
+     * Numbers in each column are sorted in ascending order without alterar la cantidad por fila.
+     * 
      * @return array<int, array<int, int|null>>
      */
     private function generateGrid(): array
     {
         $rows = array_fill(0, self::GRID_ROWS, array_fill(0, self::GRID_COLUMNS, null));
+        $usedNumbers = [];
+        $positionsByColumn = array_fill(0, self::GRID_COLUMNS, []);
 
-        for ($column = 0; $column < self::GRID_COLUMNS; $column++) {
+        // Paso 1: elegir 5 columnas por fila y registrar las posiciones
+        for ($row = 0; $row < self::GRID_ROWS; $row++) {
+            $columns = range(0, self::GRID_COLUMNS - 1);
+            shuffle($columns);
+            $selectedColumns = array_slice($columns, 0, 5);
+            sort($selectedColumns);
+
+            foreach ($selectedColumns as $column) {
+                $positionsByColumn[$column][] = $row;
+            }
+        }
+
+        // Paso 2: para cada columna, asignar números ordenados ascendentes en las filas seleccionadas
+        foreach ($positionsByColumn as $column => $rowsWithColumn) {
+            if (empty($rowsWithColumn)) {
+                continue;
+            }
+
+            sort($rowsWithColumn);
+
             $rangeStart = $column === 0 ? 1 : ($column * 10);
-            $rangeEnd = $column === 0 ? 9 : (($column * 10) + 9);
-            $numbersInColumn = random_int(1, 3);
+            $rangeEnd = $column === 0 ? 9 : ($column === self::GRID_COLUMNS - 1 ? 90 : (($column * 10) + 9));
 
-            $values = [];
-            while (count($values) < $numbersInColumn) {
-                $candidate = random_int($rangeStart, $rangeEnd);
-                if (! in_array($candidate, $values, true)) {
-                    $values[] = $candidate;
+            $available = [];
+            for ($num = $rangeStart; $num <= $rangeEnd; $num++) {
+                if (!in_array($num, $usedNumbers, true)) {
+                    $available[] = $num;
                 }
             }
 
-            sort($values);
-            $rowsForColumn = [0, 1, 2];
-            $rowsForColumn = array_slice($rowsForColumn, 0, $numbersInColumn);
-            sort($rowsForColumn);
+            if (count($available) < count($rowsWithColumn)) {
+                throw new \RuntimeException('No hay números suficientes para completar la columna.');
+            }
 
-            foreach ($rowsForColumn as $index => $row) {
-                $rows[$row][$column] = $values[$index];
+            shuffle($available);
+            $selectedNumbers = array_slice($available, 0, count($rowsWithColumn));
+            sort($selectedNumbers);
+
+            foreach ($rowsWithColumn as $index => $rowIndex) {
+                $rows[$rowIndex][$column] = $selectedNumbers[$index];
+                $usedNumbers[] = $selectedNumbers[$index];
             }
         }
 
