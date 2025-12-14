@@ -13,11 +13,12 @@ export default defineConfig({
         vue(),
     ],
     server: {
-        https: true,
         host: '0.0.0.0',
         port: 5173,
         hmr: {
-            host: 'localhost',
+            host: 'bingo.adriancecilia.com',
+            port: 443,
+            protocol: 'wss',
         },
     },
 });
