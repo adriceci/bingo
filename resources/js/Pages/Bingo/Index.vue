@@ -223,7 +223,7 @@ const activateGame = async () => {
                 <div class="flex items-center gap-2">
                     <Link
                         class="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        :href="route('bingo.create')"
+                        :href="route('bingo.home')"
                     >
                         Nueva partida
                     </Link>
