@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('games', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('winner_user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('status', 20)->default('active');
             $table->unsignedSmallInteger('max_number')->default(99);
             $table->json('drawn_numbers')->default(DB::raw('(JSON_ARRAY())'));

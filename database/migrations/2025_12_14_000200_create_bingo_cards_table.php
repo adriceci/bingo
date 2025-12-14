@@ -19,6 +19,8 @@ return new class extends Migration
             $table->json('numbers_grid');
             $table->string('grid_hash', 64);
             $table->boolean('archived')->default(false);
+            $table->boolean('has_line')->default(false);
+            $table->boolean('winner')->default(false);
             $table->timestamps();
 
             $table->foreign('game_id')->references('id')->on('games')->cascadeOnDelete();

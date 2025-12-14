@@ -24,6 +24,8 @@ class BingoCard extends Model
         'numbers_grid',
         'grid_hash',
         'archived',
+        'has_line',
+        'winner',
     ];
 
     /**

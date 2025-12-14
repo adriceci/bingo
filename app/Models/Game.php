@@ -25,6 +25,7 @@ class Game extends Model
         'status',
         'max_number',
         'drawn_numbers',
+        'winner_user_id',
     ];
 
     /**

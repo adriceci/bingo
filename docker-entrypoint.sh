@@ -30,15 +30,21 @@ mkdir -p /var/www/storage/framework/cache/data
 mkdir -p /var/www/storage/logs
 mkdir -p /var/www/bootstrap/cache
 
-# Set ownership to www-data
-chown -R www-data:www-data /var/www/storage
-chown -R www-data:www-data /var/www/bootstrap/cache
+# Set ownership to www-data recursively
+echo "Setting ownership to www-data..."
+chown -R www-data:www-data /var/www/storage 2>/dev/null || true
+chown -R www-data:www-data /var/www/bootstrap/cache 2>/dev/null || true
 
 # Set directory permissions (775 allows owner and group to write)
-find /var/www/storage -type d -exec chmod 775 {} \;
-find /var/www/storage -type f -exec chmod 664 {} \;
-find /var/www/bootstrap/cache -type d -exec chmod 775 {} \;
-find /var/www/bootstrap/cache -type f -exec chmod 664 {} \;
+echo "Setting directory and file permissions..."
+chmod -R 775 /var/www/storage 2>/dev/null || true
+chmod -R 775 /var/www/bootstrap/cache 2>/dev/null || true
+
+# Ensure specific view and cache directories are writable
+chmod 777 /var/www/storage/framework/views 2>/dev/null || true
+chmod 777 /var/www/storage/framework/cache 2>/dev/null || true
+chmod 777 /var/www/storage/framework/sessions 2>/dev/null || true
+chmod 777 /var/www/storage/logs 2>/dev/null || true
 
 echo "Permissions set successfully!"
 

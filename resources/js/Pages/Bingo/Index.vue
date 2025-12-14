@@ -107,6 +107,22 @@ const listenEvents = () => {
         .listen('GameClosed', (payload) => {
             state.status = payload.status ?? 'closed';
             notify('La partida fue cerrada', 'info');
+        })
+        .listen('LineCompleted', (payload) => {
+            state.status = 'active';
+            if (payload.userId === currentUserId.value) {
+                notify(`¡LÍNEA! Tablero ${payload.cardNumber}`, 'success');
+            } else {
+                notify(`¡LÍNEA! Un jugador completó una línea`, 'info');
+            }
+        })
+        .listen('BingoWon', (payload) => {
+            state.status = 'closed';
+            if (payload.userId === currentUserId.value) {
+                notify(`¡¡BINGO!! ¡¡Ganaste con el tablero ${payload.cardNumber}!!`, 'success');
+            } else {
+                notify(`¡¡BINGO!! Un jugador ganó la partida`, 'info');
+            }
         });
 };
 
@@ -119,6 +135,8 @@ onBeforeUnmount(() => {
         channel.value.stopListening('CardsGenerated');
         channel.value.stopListening('GameReset');
         channel.value.stopListening('GameClosed');
+        channel.value.stopListening('LineCompleted');
+        channel.value.stopListening('BingoWon');
         window.Echo.leave(channelName);
     }
 });

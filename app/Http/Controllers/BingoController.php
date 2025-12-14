@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BingoWon;
 use App\Events\CardsGenerated;
 use App\Events\GameClosed;
 use App\Events\GameReset;
 use App\Events\GameStarted;
+use App\Events\LineCompleted;
 use App\Events\NumberDrawn;
 use App\Models\BingoCard;
 use App\Models\Game;
+use App\Services\BingoDetectionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -111,10 +114,37 @@ class BingoController extends Controller
 
         broadcast(new NumberDrawn($game, $nextNumber, $drawn))->toOthers();
 
+        // Detectar líneas y bingo en todos los tableros del juego
+        $this->checkForLineAndBingo($game, $drawn);
+
         return response()->json([
             'number' => $nextNumber,
             'game' => $this->gamePayload($game),
         ]);
+    }
+
+    private function checkForLineAndBingo(Game $game, array $drawnNumbers): void
+    {
+        // Obtener todos los tableros activos del juego
+        $cards = $game->cards()->where('archived', false)->get();
+
+        foreach ($cards as $card) {
+            // Verificar si hay bingo (tablero completo)
+            if (BingoDetectionService::hasBingo($card, $drawnNumbers)) {
+                // Marcar como ganador
+                $card->update(['winner' => true]);
+                $game->update(['winner_user_id' => $card->user_id, 'status' => Game::STATUS_CLOSED]);
+
+                broadcast(new BingoWon($game, $card->user_id, $card->id, $card->card_number))->toOthers();
+                return; // El juego termina con el primer bingo
+            }
+
+            // Verificar si hay línea (solo si no tiene línea registrada aún)
+            if (!$card->has_line && BingoDetectionService::hasCompletedLine($card, $drawnNumbers)) {
+                $card->update(['has_line' => true]);
+                broadcast(new LineCompleted($game, $card, $card->user_id))->toOthers();
+            }
+        }
     }
 
     public function generateCards(Request $request, Game $game): JsonResponse
