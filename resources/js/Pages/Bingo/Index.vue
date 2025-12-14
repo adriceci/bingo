@@ -180,6 +180,15 @@ const resetGame = async () => {
     }
 };
 
+const shareGame = async () => {
+    try {
+        await navigator.clipboard.writeText(shareUrl.value);
+        notify('URL de la partida copiada al portapapeles.', 'success');
+    } catch (error) {
+        notifyError(error);
+    }
+};
+
 const closeGame = async () => {
     if (state.status === 'closed') {
         notify('La partida ya está cerrada.', 'info');
@@ -214,11 +223,8 @@ const activateGame = async () => {
             <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
                     <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                        Bingo en tiempo real
+                        Bingo
                     </h2>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                        Comparte la URL para que otros jugadores se unan: {{ shareUrl }}
-                    </p>
                 </div>
                 <div class="flex items-center gap-2">
                     <Link
@@ -227,6 +233,13 @@ const activateGame = async () => {
                     >
                         Nueva partida
                     </Link>
+                    <button
+                        class="rounded-lg bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                        type="button"
+                        @click="shareGame"
+                    >
+                        Compartir
+                    </button>
                     <button
                         class="rounded-lg bg-rose-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                         :disabled="state.loading.close || state.status === 'closed'"
@@ -243,23 +256,6 @@ const activateGame = async () => {
             <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     <div class="space-y-4 lg:col-span-2">
-                        <div class="flex flex-wrap items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                            <span
-                                class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-100"
-                            >
-                                Estado: {{ state.status }}
-                            </span>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">
-                                Restantes: {{ remainingNumbers }}
-                            </span>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">
-                                Tableros activos: {{ totalCards }} / {{ maxActiveCards }}
-                            </span>
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
-                                Archivados: {{ state.archivedCount }}
-                            </span>
-                        </div>
-
                         <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                             <div class="flex flex-wrap items-center gap-3">
                                 <button
@@ -324,17 +320,6 @@ const activateGame = async () => {
 
                     <div class="space-y-4">
                         <PlayersList :players="state.players" />
-                        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                                Compartir partida
-                            </p>
-                            <p class="mt-2 break-all rounded border border-gray-200 bg-gray-50 p-2 text-xs text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
-                                {{ shareUrl }}
-                            </p>
-                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                Cualquiera autenticado con este enlace puede unirse y ver los números en tiempo real.
-                            </p>
-                        </div>
                     </div>
                 </div>
             </div>

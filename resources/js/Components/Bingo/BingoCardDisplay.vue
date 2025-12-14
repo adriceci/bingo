@@ -17,38 +17,6 @@ const props = defineProps({
             <span>Tablero #{{ cardNumber }}</span>
         </div>
         <div class="p-3">
-            <div class="grid grid-cols-10 gap-1 text-center text-sm font-semibold text-gray-800 dark:text-gray-100">
-                <div class="rounded bg-gray-100 py-1 text-xs uppercase tracking-wide text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                    1-9
-                </div>
-                <div class="rounded bg-gray-100 py-1 text-xs uppercase tracking-wide text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                    10-19
-                </div>
-                <div class="rounded bg-gray-100 py-1 text-xs uppercase tracking-wide text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                    20-29
-                </div>
-                <div class="rounded bg-gray-100 py-1 text-xs uppercase tracking-wide text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                    30-39
-                </div>
-                <div class="rounded bg-gray-100 py-1 text-xs uppercase tracking-wide text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                    40-49
-                </div>
-                <div class="rounded bg-gray-100 py-1 text-xs uppercase tracking-wide text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                    50-59
-                </div>
-                <div class="rounded bg-gray-100 py-1 text-xs uppercase tracking-wide text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                    60-69
-                </div>
-                <div class="rounded bg-gray-100 py-1 text-xs uppercase tracking-wide text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                    70-79
-                </div>
-                <div class="rounded bg-gray-100 py-1 text-xs uppercase tracking-wide text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                    80-89
-                </div>
-                <div class="rounded bg-gray-100 py-1 text-xs uppercase tracking-wide text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                    90-99
-                </div>
-            </div>
             <div class="mt-2 grid grid-rows-3 gap-1">
                 <div v-for="(row, rowIndex) in numbersGrid" :key="rowIndex" class="grid grid-cols-10 gap-1">
                     <div

@@ -130,7 +130,7 @@ class BingoController extends Controller
         $nextCardNumber = (int) $game->cards()->max('card_number') + 1;
 
         try {
-            DB::transaction(function () use ($game, $requested, &$newCards, &$nextCardNumber) {
+            DB::transaction(function () use ($game, $requested, &$newCards, &$nextCardNumber, &$hashes) {
                 for ($i = 0; $i < $requested; $i++) {
                     [$grid, $hash] = $this->uniqueGridForGame($game, $hashes);
                     $hashes[] = $hash;
@@ -231,7 +231,6 @@ class BingoController extends Controller
 
             sort($values);
             $rowsForColumn = [0, 1, 2];
-            shuffle($rowsForColumn);
             $rowsForColumn = array_slice($rowsForColumn, 0, $numbersInColumn);
             sort($rowsForColumn);
 
