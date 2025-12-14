@@ -48,6 +48,18 @@ chmod 777 /var/www/storage/logs 2>/dev/null || true
 
 echo "Permissions set successfully!"
 
+# Install npm dependencies if needed
+if [ ! -d "/var/www/node_modules" ]; then
+    echo "Installing npm dependencies..."
+    cd /var/www && npm install
+fi
+
+# Start Vite dev server in the background
+echo "Starting Vite dev server..."
+cd /var/www && npm run dev > /var/log/vite.log 2>&1 &
+VITE_PID=$!
+echo "Vite started with PID $VITE_PID"
+
 # Execute the main command in foreground mode
 echo "Starting PHP-FPM..."
 echo "Entrypoint script completed successfully. Executing: $@"

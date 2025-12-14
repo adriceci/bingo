@@ -21,9 +21,9 @@ export default defineConfig({
         host: '0.0.0.0',
         port: 5173,
         hmr: {
-            host: 'vite.bingo.adriancecilia.com',
-            port: 443,
-            protocol: 'wss',
+            host: 'localhost',
+            port: 5173,
+            protocol: 'http',
         },
         cors: true,
     },

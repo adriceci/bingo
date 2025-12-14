@@ -1,5 +1,9 @@
 FROM php:8.4-fpm
 
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
 # Set build arguments for user and group IDs
 ARG WWWGROUP=1000
 ARG WWWUSER=1000
@@ -17,6 +21,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     netcat-openbsd \
+    supervisor \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
 # Clear cache
@@ -40,8 +45,8 @@ RUN chown -R www-data:www-data /var/www \
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Expose port 9000
-EXPOSE 9000
+# Expose port 9000 for PHP-FPM and 5173 for Vite
+EXPOSE 9000 5173
 
 # Use entrypoint to fix permissions at runtime (after volumes are mounted)
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
