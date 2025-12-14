@@ -1,5 +1,9 @@
 FROM php:8.4-fpm
 
+# Set build arguments for user and group IDs
+ARG WWWGROUP=1000
+ARG WWWUSER=1000
+
 # Set working directory
 WORKDIR /var/www
 
