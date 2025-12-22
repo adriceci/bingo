@@ -7,6 +7,8 @@ export default defineConfig({
         laravel({
             input: 'resources/js/app.js',
             refresh: true,
+            // Avoid creating `public/hot` by placing the hot file in storage
+            hotFile: 'storage/vite.hot',
         }),
         vue({
             template: {
